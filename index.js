@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 let Bill = require('./billModal')
 
-mongoose.connect("mongodb+srv://root:salman123@cluster0.aj7wm.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",()=>{console.log("mongodb Connected");})
+
 const app =express();
 
 
