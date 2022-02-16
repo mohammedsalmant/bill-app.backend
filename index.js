@@ -1,11 +1,16 @@
 const express = require ("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const cors = require('cors')
 let Bill = require('./billModal')
 
+mongoose.connect(`mongodb+srv://root:${process.env.password}@${process.env.cluster}/${process.env.db}?retryWrites=true&w=majority`, () => {
+  console.log("mongodb Connected");
+})
 
-const app =express();
+const app = express();
 
+app.use(cors())
 
 app.use(bodyParser.urlencoded({extended:false}))
 
@@ -19,23 +24,54 @@ app.get("/bill/:id",(req,res)=>{
     })
 })
 
+app.get("/bill", (req,res)=>{
+  let id=req.params.id;
+
+  Bill.find({},(err,bill)=>{
+    res.send({bills: bill})
+  })
+  
+})
+
 app.post("/bill",(req,res)=>{
-  console.log(req.body);
+    console.log(req.body);
     const {name,invoiceId,date,items,total}=req.body;
     let bill = new Bill()
     bill.name=name
-    bill.invoiceId=invoiceId
     bill.date = date
     bill.items=items
     bill.total=total
-  
-    bill.save((err)=>{
+
+    Bill.findOne().sort({$natural: -1}).limit(1).exec((err, resp)=>{
       if(err){
-        res.send({message:"Error"})
-        console.log("Error:",err);
-      }else{
-        res.send({message:"Success"})
-        console.log("Save");
+          console.log(err);
+      }
+      else{
+          console.log(resp);
+          if(resp == null){
+            bill.invoiceId = 1
+
+            bill.save((err)=>{
+              if(err){
+                res.send({message:"Error"})
+                console.log("Error:",err);
+              }else{
+                res.send({message:"Success", bill: bill})
+                console.log("Save");
+              }
+            })
+          }else{
+            bill.invoiceId = resp.invoiceId + 1
+            bill.save((err)=>{
+              if(err){
+                res.send({message:"Error"})
+                console.log("Error:",err);
+              }else{
+                res.send({message:"Success", bill: bill})
+                console.log("Save");
+              }
+            })
+          }
       }
     })
 })
