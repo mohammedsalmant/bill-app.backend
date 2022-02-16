@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require('cors')
 let Bill = require('./billModal')
 
-mongoose.connect(`mongodb+srv://root:${process.env.password}@${process.env.cluster}/${process.env.db}?retryWrites=true&w=majority`, () => {
+mongoose.connect("mongodb+srv://root:salman123@cluster0.aj7wm.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", () => {
   console.log("mongodb Connected");
 })
 
