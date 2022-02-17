@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require('cors')
 let Bill = require('./billModal')
+const {Invoice} = require('@axenda/zatca');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -36,7 +37,22 @@ app.get("/bill", (req,res)=>{
   
 })
 
+
+
 app.post("/bill",(req,res)=>{
+
+    const renderInvoice = async () => {
+      const invoice = new Invoice({
+        sellerName: 'Axenda',
+        vatRegistrationNumber: '1234567891',
+        invoiceTimestamp: '2021-12-04T00:00:00Z',
+        invoiceTotal: '100.00',
+        invoiceVatTotal: '15.00',
+      });
+      
+      return await invoice.render();
+    }
+
     console.log(req.body);
     const {name,invoiceId,date,items,total}=req.body;
     let bill = new Bill()
@@ -59,8 +75,14 @@ app.post("/bill",(req,res)=>{
                 res.send({message:"Error"})
                 console.log("Error:",err);
               }else{
-                res.send({message:"Success", bill: bill})
                 console.log("Save");
+                renderInvoice().then(data=> {
+                  console.log(data);
+                  res.send({message:"Success", bill: bill, qr: data})
+                }).catch(err=> {
+                  console.log(err);
+                  res.send({message:"Error"})
+                })
               }
             })
           }else{
@@ -70,8 +92,14 @@ app.post("/bill",(req,res)=>{
                 res.send({message:"Error"})
                 console.log("Error:",err);
               }else{
-                res.send({message:"Success", bill: bill})
                 console.log("Save");
+                renderInvoice().then(data=> {
+                  console.log(data);
+                  res.send({message:"Success", bill: bill, qr: data})
+                }).catch(err=> {
+                  console.log(err);
+                  res.send({message:"Error"})
+                })
               }
             })
           }
