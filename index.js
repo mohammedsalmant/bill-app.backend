@@ -8,9 +8,17 @@ const {Invoice} = require('@axenda/zatca');
 const dotenv = require('dotenv');
 dotenv.config();
 
-mongoose.connect(`mongodb+srv://root:${process.env.password}@${process.env.cluster}/${process.env.db}?retryWrites=true&w=majority`, () => {
+// mongoose.connect(`mongodb+srv://root:${process.env.password}@${process.env.cluster}/${process.env.db}?retryWrites=true&w=majority`, () => {
+//   console.log("mongodb Connected");
+// })
+
+mongoose.connect('mongodb+srv://admin:admin123@cluster0.7or9s.mongodb.net/?retryWrites=true&w=majority', () => {
   console.log("mongodb Connected");
 })
+
+
+
+
 
 const app = express();
 
@@ -30,6 +38,8 @@ app.get("/bill/:id",(req,res)=>{
 
 app.get("/bill", (req,res)=>{
   let id=req.params.id;
+  console.log("ok");
+  
 
   Bill.find({},(err,bill)=>{
     res.send({bills: bill})
@@ -40,21 +50,22 @@ app.get("/bill", (req,res)=>{
 
 
 app.post("/bill",(req,res)=>{
+  const {name,invoiceId,date,items,total}=req.body;
 
     const renderInvoice = async () => {
       const invoice = new Invoice({
-        sellerName: 'Axenda',
-        vatRegistrationNumber: '1234567891',
-        invoiceTimestamp: '2021-12-04T00:00:00Z',
-        invoiceTotal: '100.00',
-        invoiceVatTotal: '15.00',
+        sellerName: 'H & C Opticals',
+        vatRegistrationNumber: '302270000800003',
+        invoiceTimestamp: new Date().toISOString(),
+        invoiceTotal: total,
+        invoiceVatTotal: '00.00',
       });
       
       return await invoice.render();
     }
 
     console.log(req.body);
-    const {name,invoiceId,date,items,total}=req.body;
+    
     let bill = new Bill()
     bill.name=name
     bill.date = date
@@ -78,7 +89,7 @@ app.post("/bill",(req,res)=>{
                 console.log("Save");
                 renderInvoice().then(data=> {
                   console.log(data);
-                  res.send({message:"Success", bill: bill, qr: data})
+                  res.send({message:"Success", bill: bill, qr: data.split(",")[1]})
                 }).catch(err=> {
                   console.log(err);
                   res.send({message:"Error"})
