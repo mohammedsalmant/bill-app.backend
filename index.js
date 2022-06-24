@@ -57,7 +57,7 @@ app.post("/bill",(req,res)=>{
         sellerName: 'H & C Opticals',
         vatRegistrationNumber: '302270000800003',
         invoiceTimestamp: new Date().toISOString(),
-        invoiceTotal: total,
+        invoiceTotal: total.toString(),
         invoiceVatTotal: '00.00',
       });
       
@@ -83,7 +83,7 @@ app.post("/bill",(req,res)=>{
 
             bill.save((err)=>{
               if(err){
-                res.send({message:"Error"})
+                res.send({message:"Save Error", error: err})
                 console.log("Error:",err);
               }else{
                 console.log("Save");
@@ -92,7 +92,7 @@ app.post("/bill",(req,res)=>{
                   res.send({message:"Success", bill: bill, qr: data.split(",")[1]})
                 }).catch(err=> {
                   console.log(err);
-                  res.send({message:"Error"})
+                  res.send({message:"Zatca Error", error: err})
                 })
               }
             })
@@ -100,7 +100,7 @@ app.post("/bill",(req,res)=>{
             bill.invoiceId = resp.invoiceId + 1
             bill.save((err)=>{
               if(err){
-                res.send({message:"Error"})
+                res.send({message:"Save Error"})
                 console.log("Error:",err);
               }else{
                 console.log("Save");
